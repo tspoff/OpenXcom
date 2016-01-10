@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -600,7 +600,7 @@ __________
 || ____ ||
 ||_|XX|_||
 |________|
-*/
+ */
 		if (boundary) //to make sprite updates even being slightly outside of screen
 		{
 			sizex += _spriteWidth;

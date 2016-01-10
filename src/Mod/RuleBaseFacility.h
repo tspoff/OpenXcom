@@ -1,5 +1,6 @@
+#pragma once
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -16,15 +17,14 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef OPENXCOM_RULEBASEFACILITY_H
-#define OPENXCOM_RULEBASEFACILITY_H
-
 #include <string>
 #include <vector>
 #include <yaml-cpp/yaml.h>
 
 namespace OpenXcom
 {
+
+class Mod;
 
 /**
  * Represents a specific type of base facility.
@@ -50,7 +50,7 @@ public:
 	/// Cleans up the facility ruleset.
 	~RuleBaseFacility();
 	/// Loads the facility from YAML.
-	void load(const YAML::Node& node, int modIndex, int listOrder);
+	void load(const YAML::Node& node, Mod *mod, int listOrder);
 	/// Gets the facility's type.
 	std::string getType() const;
 	/// Gets the facility's requirements.
@@ -108,5 +108,3 @@ public:
 };
 
 }
-
-#endif

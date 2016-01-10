@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -369,6 +369,7 @@ void OptionsVideoState::updateDisplayResolution()
 	Options::newDisplayWidth = _res[_resCurrent]->w;
 	Options::newDisplayHeight = _res[_resCurrent]->h;
 }
+
 /**
  * Changes the Display Width option.
  * @param action Pointer to an action.

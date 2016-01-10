@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -24,11 +24,10 @@
 #include "../Engine/LocalizedText.h"
 #include "../Engine/Palette.h"
 #include "../Engine/Surface.h"
-#include "../Mod/ResourcePack.h"
+#include "../Mod/Mod.h"
 #include "../Interface/Text.h"
 #include "../Interface/TextButton.h"
 #include "../Interface/TextList.h"
-#include "../Mod/Ruleset.h"
 #include "../Mod/Unit.h"
 #include "../Mod/Armor.h"
 #include "../Mod/RuleItem.h"
@@ -38,9 +37,9 @@ namespace OpenXcom
 
 	ArticleStateVehicle::ArticleStateVehicle(ArticleDefinitionVehicle *defs) : ArticleState(defs->id)
 	{
-		Unit *unit = _game->getRuleset()->getUnit(defs->id);
-		Armor *armor = _game->getRuleset()->getArmor(unit->getArmor());
-		RuleItem *item = _game->getRuleset()->getItem(defs->id);
+		Unit *unit = _game->getMod()->getUnit(defs->id);
+		Armor *armor = _game->getMod()->getArmor(unit->getArmor());
+		RuleItem *item = _game->getMod()->getItem(defs->id);
 
 		// add screen elements
 		_txtTitle = new Text(310, 17, 5, 23);
@@ -58,7 +57,7 @@ namespace OpenXcom
 		add(_lstStats);
 
 		// Set up objects
-		_game->getResourcePack()->getSurface("BACK10.SCR")->blit(_bg);
+		_game->getMod()->getSurface("BACK10.SCR")->blit(_bg);
 		_btnOk->setColor(Palette::blockOffset(5));
 		_btnPrev->setColor(Palette::blockOffset(5));
 		_btnNext->setColor(Palette::blockOffset(5));
@@ -107,7 +106,7 @@ namespace OpenXcom
 				
 		if (!item->getCompatibleAmmo()->empty())
 		{
-			RuleItem *ammo = _game->getRuleset()->getItem(item->getCompatibleAmmo()->front());
+			RuleItem *ammo = _game->getMod()->getItem(item->getCompatibleAmmo()->front());
 
 			std::wostringstream ss8;
 			ss8 << ammo->getPower();

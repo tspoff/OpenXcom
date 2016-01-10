@@ -1,5 +1,6 @@
+#pragma once
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -16,9 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef OPENXCOM_FILEMAP_H
-#define OPENXCOM_FILEMAP_H
-
 #include <set>
 #include <string>
 #include <vector>
@@ -55,11 +53,9 @@ namespace FileMap
 
 	/// Scans a directory tree rooted at the specified filesystem path.  Any files it encounters that have already
 	/// been mapped will be ignored.  Therefore, load files from mods with the highest priority first.  If
-	/// ignoreRulesets is false, it will add any rulesets it finds to the front of the vector
-	/// returned by getRulesets().
-	void load(const std::string &modId, const std::string &path, bool ignoreRulesets);
+	/// ignoreMods is false, it will add any rulesets it finds to the front of the vector
+	/// returned by getMods().
+	void load(const std::string &modId, const std::string &path, bool ignoreMods);
 }
 
 }
-
-#endif

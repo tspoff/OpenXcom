@@ -1,5 +1,6 @@
+#pragma once
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -16,15 +17,14 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef OPENXCOM_RULECRAFTWEAPON_H
-#define OPENXCOM_RULECRAFTWEAPON_H
-
 #include <string>
 #include <yaml-cpp/yaml.h>
 #include "../Savegame/CraftWeaponProjectile.h"
 
 namespace OpenXcom
 {
+
+class Mod;
 
 /**
  * Represents a specific type of craft weapon.
@@ -46,7 +46,7 @@ public:
 	/// Cleans up the craft weapon ruleset.
 	~RuleCraftWeapon();
 	/// Loads craft weapon data from YAML.
-	void load(const YAML::Node& node, int modIndex);
+	void load(const YAML::Node& node, Mod *mod);
 	/// Gets the craft weapon's type.
 	std::string getType() const;
 	/// Gets the craft weapon's sprite.
@@ -82,5 +82,3 @@ public:
 };
 
 }
-
-#endif

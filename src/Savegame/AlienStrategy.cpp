@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -19,7 +19,7 @@
 #include <assert.h>
 #include "AlienStrategy.h"
 #include "WeightedOptions.h"
-#include "../Mod/Ruleset.h"
+#include "../Mod/Mod.h"
 #include "../Mod/RuleRegion.h"
 
 namespace OpenXcom
@@ -50,14 +50,14 @@ AlienStrategy::~AlienStrategy()
 
 /**
  * Get starting values from the rules.
- * @param rules Pointer to the game ruleset.
+ * @param mod Pointer to the game mod.
  */
-void AlienStrategy::init(const Ruleset *rules)
+void AlienStrategy::init(const Mod *mod)
 {
-	std::vector<std::string> regions = rules->getRegionsList();
+	std::vector<std::string> regions = mod->getRegionsList();
 	for (std::vector<std::string>::const_iterator rr = regions.begin(); rr != regions.end(); ++rr)
 	{
-		RuleRegion *region = rules->getRegion(*rr);
+		RuleRegion *region = mod->getRegion(*rr);
 		_regionChances.set(*rr, region->getWeight());
 		WeightedOptions *missions = new WeightedOptions(region->getAvailableMissions());
 		_regionMissions.insert(std::make_pair(*rr, missions));
@@ -66,10 +66,9 @@ void AlienStrategy::init(const Ruleset *rules)
 
 /**
  * Loads the data from a YAML file.
- * @param rules Pointer to the game ruleset.
  * @param node YAML node.
  */
-void AlienStrategy::load(const Ruleset *, const YAML::Node &node)
+void AlienStrategy::load(const YAML::Node &node)
 {
 	// Free allocated memory.
 	for (MissionsByRegion::iterator ii = _regionMissions.begin(); ii != _regionMissions.end(); ++ii)
@@ -88,8 +87,8 @@ void AlienStrategy::load(const Ruleset *, const YAML::Node &node)
 		options->load(missions);
 		_regionMissions.insert(std::make_pair(region, options.release()));
 	}
-	_missionLocations = node["missionLocations"].as<std::map<std::string, std::vector<std::pair<std::string, int> > > >(_missionLocations);
-	_missionRuns = node["missionsRun"].as<std::map<std::string, int> >(_missionRuns);
+	_missionLocations = node["missionLocations"].as< std::map<std::string, std::vector<std::pair<std::string, int> > > >(_missionLocations);
+	_missionRuns = node["missionsRun"].as< std::map<std::string, int> >(_missionRuns);
 }
 
 /**
@@ -114,10 +113,10 @@ YAML::Node AlienStrategy::save() const
 
 /**
  * Choose one of the regions for a mission.
- * @param rules Pointer to the ruleset.
+ * @param mod Pointer to the mod.
  * @return The region id.
  */
-std::string AlienStrategy::chooseRandomRegion(const Ruleset *rules)
+std::string AlienStrategy::chooseRandomRegion(const Mod *mod)
 {
 	std::string chosen = _regionChances.choose();
 	if (chosen.empty())
@@ -130,7 +129,7 @@ std::string AlienStrategy::chooseRandomRegion(const Ruleset *rules)
 		}
 		_regionMissions.clear();
 		// re-initialize the list
-		init(rules);
+		init(mod);
 		// now let's try that again.
 		chosen = _regionChances.choose();
 	}
@@ -232,6 +231,7 @@ bool AlienStrategy::validMissionLocation(const std::string &varName, const std::
 	}
 	return true;
 }
+
 /**
  * Checks that a given region appears in our strategy table.
  * @param region the region we want to check for validity.

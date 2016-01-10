@@ -1,5 +1,6 @@
+#pragma once
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -16,9 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef OPENXCOM_STATSTRING_H
-#define OPENXCOM_STATSTRING_H
-
 #include <yaml-cpp/yaml.h>
 #include "Unit.h"
 #include "StatStringCondition.h"
@@ -102,7 +100,7 @@ will be reduced to the size at the moment that the / statid was
 encountered.  XcomUtil will again check the length of the name, reducing
 or eliminating the first name as needed.  If this string is still too
 long, nothing will be changed.
-*/
+ */
 
 class StatString
 {
@@ -128,4 +126,3 @@ public:
 };
 
 }
-#endif

@@ -1,5 +1,6 @@
+#pragma once
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -16,10 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef OPENXCOM_UNIT_H
-#define OPENXCOM_UNIT_H
-
 #include <string>
+#include <vector>
 #include <yaml-cpp/yaml.h>
 
 namespace OpenXcom
@@ -42,6 +41,15 @@ public:
 	void merge(const UnitStats& stats) { tu = (stats.tu ? stats.tu : tu); stamina = (stats.stamina ? stats.stamina : stamina); health = (stats.health ? stats.health : health); bravery = (stats.bravery ? stats.bravery : bravery); reactions = (stats.reactions ? stats.reactions : reactions); firing = (stats.firing ? stats.firing : firing); throwing = (stats.throwing ? stats.throwing : throwing); strength = (stats.strength ? stats.strength : strength); psiStrength = (stats.psiStrength ? stats.psiStrength : psiStrength); psiSkill = (stats.psiSkill ? stats.psiSkill : psiSkill); melee = (stats.melee ? stats.melee : melee); };
 };
 
+struct StatAdjustment
+{
+	UnitStats statGrowth;
+	int growthMultiplier;
+	double aimAndArmorMultiplier;
+};
+
+class Mod;
+
 /**
  * Represents the static data for a unit that is generated on the battlescape, this includes: HWPs, aliens and civilians.
  * @sa Soldier BattleUnit
@@ -55,21 +63,21 @@ private:
 	UnitStats _stats;
 	std::string _armor;
 	int _standHeight, _kneelHeight, _floatHeight;
-	int _value, _deathSound, _aggroSound, _moveSound;
+	std::vector<int> _deathSound;
+	int _value, _aggroSound, _moveSound;
 	int _intelligence, _aggression, _energyRecovery;
 	SpecialAbility _specab;
 	std::string _spawnUnit;
 	bool _livingWeapon;
-	std::string _meleeWeapon;
+	std::string _meleeWeapon, _psiWeapon;
 	std::vector<std::string> _builtInWeapons;
-	bool _female;
 public:
 	/// Creates a blank unit ruleset.
 	Unit(const std::string &type);
 	/// Cleans up the unit ruleset.
 	~Unit();
 	/// Loads the unit data from YAML.
-	void load(const YAML::Node& node, int modIndex);
+	void load(const YAML::Node& node, Mod *mod);
 	/// Gets the unit's type.
 	std::string getType() const;
 	/// Gets the unit's stats.
@@ -89,7 +97,7 @@ public:
 	/// Gets the value - for score calculation.
 	int getValue() const;
 	/// Gets the death sound id.
-	int getDeathSound() const;
+	const std::vector<int> &getDeathSounds() const;
 	/// Gets the move sound id.
 	int getMoveSound() const;
 	/// Gets the intelligence. This is the number of turns AI remembers your troop positions.
@@ -108,10 +116,10 @@ public:
 	bool isLivingWeapon() const;
 	/// Gets the name of any melee weapon that may be built in to this unit.
 	std::string getMeleeWeapon() const;
+	/// Gets the name of any psi weapon that may be built in to this unit.
+	std::string getPsiWeapon() const;
 	/// Gets a vector of integrated items this unit has available.
 	const std::vector<std::string> &getBuiltInWeapons() const;
-	/// Is this unit a female?
-	bool isFemale() const;
 };
 
 }
@@ -158,5 +166,3 @@ namespace YAML
 		}
 	};
 }
-
-#endif

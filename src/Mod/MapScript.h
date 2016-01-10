@@ -1,5 +1,6 @@
+#pragma once
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -16,10 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef OPENXCOM_MAPSCRIPT_H
-#define OPENXCOM_MAPSCRIPT_H
-
-
 #include <vector>
 #include <string>
 #include <yaml-cpp/yaml.h>
@@ -61,6 +58,7 @@ private:
 	int _sizeX, _sizeY, _sizeZ, _executionChances, _executions, _cumulativeFrequency, _label;
 	MapDirection _direction;
 	TunnelData *_tunnelData;
+	std::string _ufoName;
 
 	/// Randomly generate a group from within the array.
 	int getGroupNumber();
@@ -101,6 +99,8 @@ public:
 	TunnelData *getTunnelData() {return _tunnelData;};
 	/// Randomly generate a block from within either the array of groups or blocks.
 	MapBlock *getNextBlock(RuleTerrain *terrain);
+	/// Gets the UFO's name (for setUFO)
+	std::string getUFOName();
 };
+
 }
-#endif

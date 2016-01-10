@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -18,6 +18,7 @@
  */
 #include "RuleCraft.h"
 #include "RuleTerrain.h"
+#include "Mod.h"
 
 namespace OpenXcom
 {
@@ -27,7 +28,7 @@ namespace OpenXcom
  * type of craft.
  * @param type String defining the type.
  */
-RuleCraft::RuleCraft(const std::string &type) : _type(type), _sprite(-1), _marker(-1), _fuelMax(0), _damageMax(0), _speedMax(0), _accel(0), _weapons(0), _soldiers(0), _vehicles(0), _costBuy(0), _costRent(0), _costSell(0), _repairRate(1), _refuelRate(1), _radarRange(672), _sightRange(1696), _transferTime(0), _score(0), _battlescapeTerrainData(0), _spacecraft(false), _listOrder(0), _maxItems(0), _maxDepth(0)
+RuleCraft::RuleCraft(const std::string &type) : _type(type), _sprite(-1), _marker(-1), _fuelMax(0), _damageMax(0), _speedMax(0), _accel(0), _weapons(0), _soldiers(0), _vehicles(0), _costBuy(0), _costRent(0), _costSell(0), _repairRate(1), _refuelRate(1), _radarRange(672), _radarChance(100), _sightRange(1696), _transferTime(0), _score(0), _battlescapeTerrainData(0), _spacecraft(false), _listOrder(0), _maxItems(0), _maxDepth(0)
 {
 
 }
@@ -43,11 +44,11 @@ RuleCraft::~RuleCraft()
 /**
  * Loads the craft from a YAML file.
  * @param node YAML node.
- * @param ruleset Ruleset for the craft.
+ * @param mod Mod for the craft.
  * @param modIndex A value that offsets the sounds and sprite values to avoid conflicts.
  * @param listOrder The list weight for this craft.
  */
-void RuleCraft::load(const YAML::Node &node, Ruleset *ruleset, int modIndex, int listOrder)
+void RuleCraft::load(const YAML::Node &node, Mod *mod, int listOrder)
 {
 	_type = node["type"].as<std::string>(_type);
 	_requires = node["requires"].as< std::vector<std::string> >(_requires);
@@ -56,7 +57,7 @@ void RuleCraft::load(const YAML::Node &node, Ruleset *ruleset, int modIndex, int
 		_sprite = node["sprite"].as<int>(_sprite);
 		// this is an offset in BASEBITS.PCK, and two in INTICONS.PCK
 		if (_sprite > 4)
-			_sprite += modIndex;
+			_sprite += mod->getModOffset();
 	}
 	_marker = node["marker"].as<int>(_marker);
 	_fuelMax = node["fuelMax"].as<int>(_fuelMax);
@@ -73,13 +74,14 @@ void RuleCraft::load(const YAML::Node &node, Ruleset *ruleset, int modIndex, int
 	_repairRate = node["repairRate"].as<int>(_repairRate);
 	_refuelRate = node["refuelRate"].as<int>(_refuelRate);
 	_radarRange = node["radarRange"].as<int>(_radarRange);
+	_radarChance = node["radarChance"].as<int>(_radarChance);
 	_sightRange = node["sightRange"].as<int>(_sightRange);
 	_transferTime = node["transferTime"].as<int>(_transferTime);
 	_score = node["score"].as<int>(_score);
 	if (const YAML::Node &terrain = node["battlescapeTerrainData"])
 	{
 		RuleTerrain *rule = new RuleTerrain(terrain["name"].as<std::string>());
-		rule->load(terrain, ruleset);
+		rule->load(terrain, mod);
 		_battlescapeTerrainData = rule;
 		
 		if (const YAML::Node &deployment = node["deployment"])

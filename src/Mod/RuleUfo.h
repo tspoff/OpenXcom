@@ -1,5 +1,6 @@
+#pragma once
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -16,9 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef OPENXCOM_RULEUFO_H
-#define OPENXCOM_RULEUFO_H
-
 #include <string>
 #include <yaml-cpp/yaml.h>
 
@@ -26,7 +24,7 @@ namespace OpenXcom
 {
 
 class RuleTerrain;
-class Ruleset;
+class Mod;
 
 /**
  * Represents a specific type of UFO.
@@ -48,7 +46,7 @@ public:
 	/// Cleans up the UFO ruleset.
 	~RuleUfo();
 	/// Loads UFO data from YAML.
-	void load(const YAML::Node& node, Ruleset *ruleset);
+	void load(const YAML::Node& node, Mod *mod);
 	/// Gets the UFO's type.
 	std::string getType() const;
 	/// Gets the UFO's size.
@@ -84,5 +82,3 @@ public:
 };
 
 }
-
-#endif

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -59,7 +59,7 @@
 #include "../Menu/PauseState.h"
 #include "../Menu/LoadGameState.h"
 #include "../Menu/SaveGameState.h"
-#include "../Mod/ResourcePack.h"
+#include "../Mod/Mod.h"
 #include "../Mod/RuleItem.h"
 #include "../Mod/AlienDeployment.h"
 #include "../Mod/Armor.h"
@@ -69,7 +69,6 @@
 #include "../Savegame/BattleUnit.h"
 #include "../Savegame/Soldier.h"
 #include "../Savegame/BattleItem.h"
-#include "../Mod/Ruleset.h"
 #include "../Mod/RuleInterface.h"
 
 namespace OpenXcom
@@ -85,8 +84,8 @@ BattlescapeState::BattlescapeState() : _reserve(0), _xBeforeMouseScrolling(0), _
 
 	const int screenWidth = Options::baseXResolution;
 	const int screenHeight = Options::baseYResolution;
-	const int iconsWidth = _game->getRuleset()->getInterface("battlescape")->getElement("icons")->w;
-	const int iconsHeight = _game->getRuleset()->getInterface("battlescape")->getElement("icons")->h;
+	const int iconsWidth = _game->getMod()->getInterface("battlescape")->getElement("icons")->w;
+	const int iconsHeight = _game->getMod()->getInterface("battlescape")->getElement("icons")->h;
 	const int visibleMapHeight = screenHeight - iconsHeight;
 	_mouseOverIcons = false;
 	const int x = screenWidth/2 - iconsWidth/2;
@@ -128,8 +127,8 @@ BattlescapeState::BattlescapeState() : _reserve(0), _xBeforeMouseScrolling(0), _
 	_numAmmoLeft = new NumberText(30, 5, x + 8, y + 4);
 	_btnRightHandItem = new InteractiveSurface(32, 48, x + 280, y + 4);
 	_numAmmoRight = new NumberText(30, 5, x + 280, y + 4);
-	const int visibleUnitX = _game->getRuleset()->getInterface("battlescape")->getElement("visibleUnits")->x;
-	const int visibleUnitY = _game->getRuleset()->getInterface("battlescape")->getElement("visibleUnits")->y;
+	const int visibleUnitX = _game->getMod()->getInterface("battlescape")->getElement("visibleUnits")->x;
+	const int visibleUnitY = _game->getMod()->getInterface("battlescape")->getElement("visibleUnits")->y;
 	for (int i = 0; i < VISIBLE_MAX; ++i)
 	{
 		_btnVisibleUnit[i] = new InteractiveSurface(15, 12, x + visibleUnitX, y + visibleUnitY - (i * 13));
@@ -163,9 +162,9 @@ BattlescapeState::BattlescapeState() : _reserve(0), _xBeforeMouseScrolling(0), _
 	// Set palette
 	_game->getSavedGame()->getSavedBattle()->setPaletteByDepth(this);
 
-	if (_game->getRuleset()->getInterface("battlescape")->getElement("pathfinding"))
+	if (_game->getMod()->getInterface("battlescape")->getElement("pathfinding"))
 	{
-		Element *pathing = _game->getRuleset()->getInterface("battlescape")->getElement("pathfinding");
+		Element *pathing = _game->getMod()->getInterface("battlescape")->getElement("pathfinding");
 		
 		Pathfinding::green = pathing->color;
 		Pathfinding::yellow = pathing->color2;
@@ -176,10 +175,10 @@ BattlescapeState::BattlescapeState() : _reserve(0), _xBeforeMouseScrolling(0), _
 	add(_icons);
 	
 	// Add in custom reserve buttons
-	Surface *icons = _game->getResourcePack()->getSurface("ICONS.PCK");
-	if (_game->getResourcePack()->getSurface("TFTDReserve"))
+	Surface *icons = _game->getMod()->getSurface("ICONS.PCK");
+	if (_game->getMod()->getSurface("TFTDReserve"))
 	{
-		Surface *tftdIcons = _game->getResourcePack()->getSurface("TFTDReserve");
+		Surface *tftdIcons = _game->getMod()->getSurface("TFTDReserve");
 		tftdIcons->setX(48);
 		tftdIcons->setY(176);
 		tftdIcons->blit(icons);
@@ -195,7 +194,7 @@ BattlescapeState::BattlescapeState() : _reserve(0), _xBeforeMouseScrolling(0), _
 	icons->blit(_icons);
 
 	// this is a hack to fix the single transparent pixel on TFTD's icon panel.
-	if (_game->getRuleset()->getInterface("battlescape")->getElement("icons")->TFTDMode)
+	if (_game->getMod()->getInterface("battlescape")->getElement("icons")->TFTDMode)
 	{
 		_icons->setPixel(46, 44, 8);
 	}
@@ -245,9 +244,9 @@ BattlescapeState::BattlescapeState() : _reserve(0), _xBeforeMouseScrolling(0), _
 	add(_txtDebug);
 	add(_txtTooltip, "textTooltip", "battlescape", _icons);
 	add(_btnLaunch);
-	_game->getResourcePack()->getSurfaceSet("SPICONS.DAT")->getFrame(0)->blit(_btnLaunch);
+	_game->getMod()->getSurfaceSet("SPICONS.DAT")->getFrame(0)->blit(_btnLaunch);
 	add(_btnPsi);
-	_game->getResourcePack()->getSurfaceSet("SPICONS.DAT")->getFrame(1)->blit(_btnPsi);
+	_game->getMod()->getSurfaceSet("SPICONS.DAT")->getFrame(1)->blit(_btnPsi);
 
 	// Set up objects
 	_save = _game->getSavedGame()->getSavedBattle();
@@ -419,7 +418,7 @@ BattlescapeState::BattlescapeState() : _reserve(0), _xBeforeMouseScrolling(0), _
 						Options::keyBattleCenterEnemy8,
 						Options::keyBattleCenterEnemy9,
 						Options::keyBattleCenterEnemy10};
-	Uint8 color = _game->getRuleset()->getInterface("battlescape")->getElement("visibleUnits")->color;
+	Uint8 color = _game->getMod()->getInterface("battlescape")->getElement("visibleUnits")->color;
 	for (int i = 0; i < VISIBLE_MAX; ++i)
 	{
 		std::ostringstream tooltip;
@@ -432,8 +431,8 @@ BattlescapeState::BattlescapeState() : _reserve(0), _xBeforeMouseScrolling(0), _
 		_numVisibleUnit[i]->setColor(color);
 		_numVisibleUnit[i]->setValue(i+1);
 	}
-	_warning->setColor(_game->getRuleset()->getInterface("battlescape")->getElement("warning")->color2);
-	_warning->setTextColor(_game->getRuleset()->getInterface("battlescape")->getElement("warning")->color);
+	_warning->setColor(_game->getMod()->getInterface("battlescape")->getElement("warning")->color2);
+	_warning->setTextColor(_game->getMod()->getInterface("battlescape")->getElement("warning")->color);
 	_btnLaunch->onMouseClick((ActionHandler)&BattlescapeState::btnLaunchClick);
 	_btnPsi->onMouseClick((ActionHandler)&BattlescapeState::btnPsiClick);
 
@@ -457,11 +456,11 @@ BattlescapeState::BattlescapeState() : _reserve(0), _xBeforeMouseScrolling(0), _
 	// Set music
 	if (_save->getMusic() == "")
 	{
-		_game->getResourcePack()->playMusic("GMTACTIC");
+		_game->getMod()->playMusic("GMTACTIC");
 	}
 	else
 	{
-		_game->getResourcePack()->playMusic(_save->getMusic());
+		_game->getMod()->playMusic(_save->getMusic());
 	}
 
 	_animTimer = new Timer(DEFAULT_ANIM_SPEED, true);
@@ -495,11 +494,12 @@ void BattlescapeState::init()
 {
 	if (_save->getAmbientSound() != -1)
 	{
-		_game->getResourcePack()->getSoundByDepth(_save->getDepth(), _save->getAmbientSound())->loop();
+		_game->getMod()->getSoundByDepth(_save->getDepth(), _save->getAmbientSound())->loop();
 		_game->setVolume(Options::soundVolume, Options::musicVolume, Options::uiVolume);
 	}
 
 	State::init();
+	_barHealthColor = _barHealth->getColor();
 	_animTimer->start();
 	_gameTimer->start();
 	_map->setFocus(true);
@@ -991,6 +991,7 @@ void BattlescapeState::selectPreviousPlayerUnit(bool checkReselect, bool setRese
 		_battleGame->setupCursor();
 	}
 }
+
 /**
  * Shows/hides all map layers.
  * @param action Pointer to an action.
@@ -1023,6 +1024,7 @@ void BattlescapeState::btnEndTurnClick(Action *)
 		_battleGame->requestEndTurn();
 	}
 }
+
 /**
  * Aborts the game.
  * @param action Pointer to an action.
@@ -1208,7 +1210,7 @@ void BattlescapeState::btnReloadClick(Action *)
 {
 	if (playableUnitSelected() && _save->getSelectedUnit()->checkAmmo())
 	{
-		_game->getResourcePack()->getSoundByDepth(_save->getDepth(), ResourcePack::ITEM_RELOAD)->play(-1, getMap()->getSoundAngle(_save->getSelectedUnit()->getPosition()));
+		_game->getMod()->getSoundByDepth(_save->getDepth(), Mod::ITEM_RELOAD)->play(-1, getMap()->getSoundAngle(_save->getSelectedUnit()->getPosition()));
 		updateSoldierInfo();
 	}
 }
@@ -1276,7 +1278,7 @@ void BattlescapeState::updateSoldierInfo()
 	Soldier *soldier = battleUnit->getGeoscapeSoldier();
 	if (soldier != 0)
 	{
-		SurfaceSet *texture = _game->getResourcePack()->getSurfaceSet("SMOKE.PCK");
+		SurfaceSet *texture = _game->getMod()->getSurfaceSet("SMOKE.PCK");
 		texture->getFrame(20 + soldier->getRank())->blit(_rank);
 	}
 	else
@@ -1302,7 +1304,7 @@ void BattlescapeState::updateSoldierInfo()
 	_numAmmoLeft->setVisible(false);
 	if (leftHandItem)
 	{
-		leftHandItem->getRules()->drawHandSprite(_game->getResourcePack()->getSurfaceSet("BIGOBS.PCK"), _btnLeftHandItem);
+		leftHandItem->getRules()->drawHandSprite(_game->getMod()->getSurfaceSet("BIGOBS.PCK"), _btnLeftHandItem);
 		if (leftHandItem->getRules()->getBattleType() == BT_FIREARM && (leftHandItem->needsAmmo() || leftHandItem->getRules()->getClipSize() > 0))
 		{
 			_numAmmoLeft->setVisible(true);
@@ -1317,7 +1319,7 @@ void BattlescapeState::updateSoldierInfo()
 	_numAmmoRight->setVisible(false);
 	if (rightHandItem)
 	{
-		rightHandItem->getRules()->drawHandSprite(_game->getResourcePack()->getSurfaceSet("BIGOBS.PCK"), _btnRightHandItem);
+		rightHandItem->getRules()->drawHandSprite(_game->getMod()->getSurfaceSet("BIGOBS.PCK"), _btnRightHandItem);
 		if (rightHandItem->getRules()->getBattleType() == BT_FIREARM && (rightHandItem->needsAmmo() || rightHandItem->getRules()->getClipSize() > 0))
 		{
 			_numAmmoRight->setVisible(true);
@@ -1364,6 +1366,29 @@ void BattlescapeState::blinkVisibleUnitButtons()
 }
 
 /**
+ * Shifts the colors of the health bar when unit has fatal wounds.
+ */
+void BattlescapeState::blinkHealthBar()
+{
+	static Uint8 color = 0, maxcolor = 3, step = 0;
+
+	step ^= 1;	// 1, 0, 1, 0, ...
+	BattleUnit *bu = _save->getSelectedUnit();
+	if (step == 0 || bu == 0 || !_barHealth->getVisible()) return;
+
+	if (++color > maxcolor) color = maxcolor - 3;
+
+	for (int i = 0; i < 6; i++)
+	{
+		if (bu->getFatalWound(i) > 0)
+		{
+			_barHealth->setColor(_barHealthColor + color);
+			break;
+		}
+	}
+}
+
+/**
  * Popups a context sensitive list of actions the user can choose from.
  * Some actions result in a change of gamestate.
  * @param item Item the user clicked on (righthand/lefthand)
@@ -1386,6 +1411,7 @@ void BattlescapeState::animate()
 	_map->animate(!_battleGame->isBusy());
 
 	blinkVisibleUnitButtons();
+	blinkHealthBar();
 }
 
 /**
@@ -1529,8 +1555,7 @@ inline void BattlescapeState::handle(Action *action)
 					}
 				}
 				// quick save and quick load
-				// not works in debug mode to prevent conflict in hotkeys by default
-				else if (!_game->getSavedGame()->isIronman())
+				if (!_game->getSavedGame()->isIronman())
 				{
 					if (action->getDetails()->key.keysym.sym == Options::keyQuickSave)
 					{
@@ -1903,12 +1928,12 @@ void BattlescapeState::finishBattle(bool abort, int inExitArea)
 	_game->getCursor()->setVisible(true);
 	if (_save->getAmbientSound() != -1)
 	{
-		_game->getResourcePack()->getSoundByDepth(0, _save->getAmbientSound())->stopLoop();
+		_game->getMod()->getSoundByDepth(0, _save->getAmbientSound())->stopLoop();
 	}
 	std::string nextStage;
 	if (_save->getMissionType() != "STR_UFO_GROUND_ASSAULT" && _save->getMissionType() != "STR_UFO_CRASH_RECOVERY")
 	{
-		nextStage = _game->getRuleset()->getDeployment(_save->getMissionType())->getNextStage();
+		nextStage = _game->getMod()->getDeployment(_save->getMissionType())->getNextStage();
 	}
 
 	if (!nextStage.empty() && inExitArea)
@@ -1929,15 +1954,15 @@ void BattlescapeState::finishBattle(bool abort, int inExitArea)
 		_game->popState();
 		_game->pushState(new DebriefingState);
 		std::string cutscene;
-		if (_game->getRuleset()->getDeployment(_save->getMissionType()))
+		if (_game->getMod()->getDeployment(_save->getMissionType()))
 		{
 			if (abort || inExitArea == 0)
 			{
-				cutscene = _game->getRuleset()->getDeployment(_save->getMissionType())->getLoseCutscene();
+				cutscene = _game->getMod()->getDeployment(_save->getMissionType())->getLoseCutscene();
 			}
 			else
 			{
-				cutscene = _game->getRuleset()->getDeployment(_save->getMissionType())->getWinCutscene();
+				cutscene = _game->getMod()->getDeployment(_save->getMissionType())->getWinCutscene();
 			}
 		}
 		if (!cutscene.empty())
@@ -2075,9 +2100,9 @@ void BattlescapeState::btnZeroTUsClick(Action *action)
 }
 
 /**
-* Shows a tooltip for the appropriate button.
-* @param action Pointer to an action.
-*/
+ * Shows a tooltip for the appropriate button.
+ * @param action Pointer to an action.
+ */
 void BattlescapeState::txtTooltipIn(Action *action)
 {
 	if (allowButtons() && Options::battleTooltips)
@@ -2088,9 +2113,9 @@ void BattlescapeState::txtTooltipIn(Action *action)
 }
 
 /**
-* Clears the tooltip text.
-* @param action Pointer to an action.
-*/
+ * Clears the tooltip text.
+ * @param action Pointer to an action.
+ */
 void BattlescapeState::txtTooltipOut(Action *action)
 {
 	if (allowButtons() && Options::battleTooltips)

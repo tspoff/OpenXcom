@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -170,6 +170,7 @@ void UnitSprite::setAnimationFrame(int frame)
 {
 	_animationFrame = frame;
 }
+
 /**
  * Draws a unit, using the drawing rules of the unit.
  * This function is called by Map, for each unit on the screen.
@@ -1297,8 +1298,8 @@ void UnitSprite::drawRoutine9()
 }
 
 /**
-* Drawing routine for tftd tanks.
-*/
+ * Drawing routine for tftd tanks.
+ */
 void UnitSprite::drawRoutine11()
 {
 	if (_unit->isOut())
@@ -1339,8 +1340,8 @@ void UnitSprite::drawRoutine11()
 }
 
 /**
-* Drawing routine for hallucinoids (routine 12) and biodrones (routine 16).
-*/
+ * Drawing routine for hallucinoids (routine 12) and biodrones (routine 16).
+ */
 void UnitSprite::drawRoutine12()
 {
 	const int die = 8;

@@ -1,5 +1,6 @@
+#pragma once
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -16,9 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef OPENXCOM_RULETERRAIN_H
-#define OPENXCOM_RULETERRAIN_H
-
 #include <vector>
 #include <string>
 #include <yaml-cpp/yaml.h>
@@ -30,7 +28,7 @@ namespace OpenXcom
 class MapBlock;
 class MapDataSet;
 class MapData;
-class Ruleset;
+class Mod;
 
 /**
  * Represents a specific type of Battlescape Terrain.
@@ -51,7 +49,7 @@ public:
 	RuleTerrain(const std::string &name);
 	~RuleTerrain();
 	/// Loads the terrain from YAML.
-	void load(const YAML::Node& node, Ruleset *ruleset);
+	void load(const YAML::Node& node, Mod *mod);
 	/// Gets the terrain's name (used for MAP generation).
 	std::string getName() const;
 	/// Gets the terrain's mapblocks.
@@ -80,5 +78,3 @@ public:
 };
 
 }
-
-#endif

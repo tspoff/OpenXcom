@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -33,7 +33,7 @@ ResearchProject::ResearchProject(RuleResearch * p, int c) : _project(p), _assign
 /**
  * Called every day to compute time spent on this ResearchProject
  * @return true if the ResearchProject is finished
-*/
+ */
 bool ResearchProject::step()
 {
 	_spent += _assigned;
@@ -131,7 +131,7 @@ YAML::Node ResearchProject::save() const
 /**
  * Return a string describing Research progress.
  * @return a string describing Research progress.
-*/
+ */
 std::string ResearchProject::getResearchProgress() const
 {
 	float progress = (float)getSpent() / getRules()->getCost();

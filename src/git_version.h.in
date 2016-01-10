@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2014 OpenXcom Developers.
+ * Copyright 2010-2015 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -16,17 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef OPENXCOM_CRAFTID_H
-#define OPENXCOM_CRAFTID_H
+#ifndef GIT_VERSION_H
+#define GIT_VERSION_H
 
-#include <utility>
-#include <string>
-
-namespace OpenXcom
-{
-
-typedef std::pair<std::string, int> CraftId;
-
-}
+#ifndef OPENXCOM_VERSION_GIT
+#define OPENXCOM_VERSION_GIT "@OPENXCOM_VERSION_STRING@"
+#endif
 
 #endif

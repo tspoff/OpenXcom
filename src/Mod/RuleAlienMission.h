@@ -1,5 +1,6 @@
+#pragma once
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -16,9 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef OPENXCOM_RULEALIENMISSION_H
-#define OPENXCOM_RULEALIENMISSION_H
-
 #include <vector>
 #include <map>
 #include <string>
@@ -92,6 +90,8 @@ public:
 	int getSpawnZone() const { return _spawnZone; }
 	/// Gets the chances of this mission based on the game time.
 	int getWeight(const size_t monthsPassed) const;
+	/// Gets the inherent odds of this mission spawning a retaliation mission.
+	int getRetaliationOdds() const;
 private:
 	/// The mission's type ID.
 	std::string _type;
@@ -109,7 +109,8 @@ private:
 	MissionObjective _objective;
 	/// The mission zone to use for spawning.
 	int _spawnZone;
+	/// The odds that this mission will result in retaliation
+	int _retaliationOdds;
 };
 
 }
-#endif

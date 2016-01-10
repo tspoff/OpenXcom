@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -28,7 +28,7 @@
 #include "../Savegame/BattleItem.h"
 #include "../Savegame/SavedBattleGame.h"
 #include "../Savegame/Tile.h"
-#include "../Mod/ResourcePack.h"
+#include "../Mod/Mod.h"
 #include "../Engine/Sound.h"
 #include "../Mod/RuleItem.h"
 #include "../Engine/Options.h"
@@ -36,6 +36,7 @@
 #include "Camera.h"
 #include "Explosion.h"
 #include "BattlescapeState.h"
+#include "../Savegame/BattleUnitStatistics.h"
 
 namespace OpenXcom
 {
@@ -276,9 +277,12 @@ void ProjectileFlyBState::init()
 bool ProjectileFlyBState::createNewProjectile()
 {
 	++_action.autoShotCounter;
-	
+
+	if (_action.type != BA_THROW && _action.type != BA_LAUNCH)
+		_unit->getStatistics()->shotsFiredCounter++;
+
 	// create a new projectile
-	Projectile *projectile = new Projectile(_parent->getResourcePack(), _parent->getSave(), _action, _origin, _targetVoxel, _ammo);
+	Projectile *projectile = new Projectile(_parent->getMod(), _parent->getSave(), _action, _origin, _targetVoxel, _ammo);
 
 	// add the projectile on the map
 	_parent->getMap()->setProjectile(projectile);
@@ -308,7 +312,7 @@ bool ProjectileFlyBState::createNewProjectile()
 			_projectileItem->moveToOwner(0);
 			_unit->setCache(0);
 			_parent->getMap()->cacheUnit(_unit);
-			_parent->getResourcePack()->getSoundByDepth(_parent->getDepth(), ResourcePack::ITEM_THROW)->play(-1, _parent->getMap()->getSoundAngle(_unit->getPosition()));
+			_parent->getMod()->getSoundByDepth(_parent->getDepth(), Mod::ITEM_THROW)->play(-1, _parent->getMap()->getSoundAngle(_unit->getPosition()));
 			_unit->addThrowingExp();
 		}
 		else
@@ -334,11 +338,11 @@ bool ProjectileFlyBState::createNewProjectile()
 			// and we have a lift-off
 			if (_ammo->getRules()->getFireSound() != -1)
 			{
-				_parent->getResourcePack()->getSoundByDepth(_parent->getDepth(), _ammo->getRules()->getFireSound())->play(-1, _parent->getMap()->getSoundAngle(_unit->getPosition()));
+				_parent->getMod()->getSoundByDepth(_parent->getDepth(), _ammo->getRules()->getFireSound())->play(-1, _parent->getMap()->getSoundAngle(_unit->getPosition()));
 			}
 			else if (_action.weapon->getRules()->getFireSound() != -1)
 			{
-				_parent->getResourcePack()->getSoundByDepth(_parent->getDepth(), _action.weapon->getRules()->getFireSound())->play(-1, _parent->getMap()->getSoundAngle(_unit->getPosition()));
+				_parent->getMod()->getSoundByDepth(_parent->getDepth(), _action.weapon->getRules()->getFireSound())->play(-1, _parent->getMap()->getSoundAngle(_unit->getPosition()));
 			}
 			if (!_parent->getSave()->getDebugMode() && _action.type != BA_LAUNCH && _ammo->spendBullet() == false)
 			{
@@ -368,7 +372,7 @@ bool ProjectileFlyBState::createNewProjectile()
 	{
 		if (_originVoxel != Position(-1,-1,-1))
 		{
-			_projectileImpact = projectile->calculateTrajectory(_unit->getFiringAccuracy(_action.type, _action.weapon) / accuracyDivider, _originVoxel);
+			_projectileImpact = projectile->calculateTrajectory(_unit->getFiringAccuracy(_action.type, _action.weapon) / accuracyDivider, _originVoxel, false);
 		}
 		else
 		{
@@ -383,11 +387,11 @@ bool ProjectileFlyBState::createNewProjectile()
 			// and we have a lift-off
 			if (_ammo->getRules()->getFireSound() != -1)
 			{
-				_parent->getResourcePack()->getSoundByDepth(_parent->getDepth(), _ammo->getRules()->getFireSound())->play(-1, _parent->getMap()->getSoundAngle(projectile->getOrigin()));
+				_parent->getMod()->getSoundByDepth(_parent->getDepth(), _ammo->getRules()->getFireSound())->play(-1, _parent->getMap()->getSoundAngle(projectile->getOrigin()));
 			}
 			else if (_action.weapon->getRules()->getFireSound() != -1)
 			{
-				_parent->getResourcePack()->getSoundByDepth(_parent->getDepth(), _action.weapon->getRules()->getFireSound())->play(-1, _parent->getMap()->getSoundAngle(projectile->getOrigin()));
+				_parent->getMod()->getSoundByDepth(_parent->getDepth(), _action.weapon->getRules()->getFireSound())->play(-1, _parent->getMap()->getSoundAngle(projectile->getOrigin()));
 			}
 			if (!_parent->getSave()->getDebugMode() && _action.type != BA_LAUNCH && _ammo->spendBullet() == false)
 			{
@@ -494,7 +498,7 @@ void ProjectileFlyBState::think()
 					pos.x--;
 				}
 				BattleItem *item = _parent->getMap()->getProjectile()->getItem();
-				_parent->getResourcePack()->getSoundByDepth(_parent->getDepth(), ResourcePack::ITEM_DROP)->play(-1, _parent->getMap()->getSoundAngle(pos));
+				_parent->getMod()->getSoundByDepth(_parent->getDepth(), Mod::ITEM_DROP)->play(-1, _parent->getMap()->getSoundAngle(pos));
 
 				if (Options::battleInstantGrenade && item->getRules()->getBattleType() == BT_GRENADE && item->getFuseTimer() == 0)
 				{
@@ -527,6 +531,11 @@ void ProjectileFlyBState::think()
 			}
 			else
 			{
+				if (_parent->getSave()->getTile(_action.target)->getUnit())
+				{
+					_parent->getSave()->getTile(_action.target)->getUnit()->getStatistics()->shotAtCounter++; // Only counts for guns, not throws or launches
+				}
+
 				_parent->getMap()->resetCameraSmoothing();
 				if (_ammo && _action.type == BA_LAUNCH && _ammo->spendBullet() == false)
 				{
@@ -551,7 +560,7 @@ void ProjectileFlyBState::think()
 						while (i != _ammo->getRules()->getShotgunPellets())
 						{
 							// create a projectile
-							Projectile *proj = new Projectile(_parent->getResourcePack(), _parent->getSave(), _action, _origin, _targetVoxel, _ammo);
+							Projectile *proj = new Projectile(_parent->getMod(), _parent->getSave(), _action, _origin, _targetVoxel, _ammo);
 							// let it trace to the point where it hits
 							_projectileImpact = proj->calculateTrajectory(std::max(0.0, (_unit->getFiringAccuracy(_action.type, _action.weapon) / 100.0) - i * 5.0));
 							if (_projectileImpact != V_EMPTY)
@@ -574,14 +583,43 @@ void ProjectileFlyBState::think()
 					if (_projectileImpact == 4)
 					{
 						BattleUnit *victim = _parent->getSave()->getTile(_parent->getMap()->getProjectile()->getPosition(offset) / Position(16,16,24))->getUnit();
-						if (victim && !victim->isOut() && victim->getFaction() == FACTION_HOSTILE)
+						BattleUnit *targetVictim = _parent->getSave()->getTile(_action.target)->getUnit(); // Who we were aiming at (not necessarily who we hit)
+						if (victim && !victim->isOut())
 						{
-							AlienBAIState *aggro = dynamic_cast<AlienBAIState*>(victim->getCurrentAIState());
-							if (aggro != 0)
+							victim->getStatistics()->hitCounter++;
+							if (_unit->getOriginalFaction() == FACTION_PLAYER && victim->getOriginalFaction() == FACTION_PLAYER) 
 							{
-								aggro->setWasHitBy(_unit);
-								_unit->setTurnsSinceSpotted(0);
+								victim->getStatistics()->shotByFriendlyCounter++;
+								_unit->getStatistics()->shotFriendlyCounter++;
 							}
+							if (victim == targetVictim) // Hit our target
+							{
+								_unit->getStatistics()->shotsLandedCounter++;
+								if (_parent->getTileEngine()->distance(_action.actor->getPosition(), victim->getPosition()) > 30)
+								{
+									_unit->getStatistics()->longDistanceHitCounter++;
+								}
+								if (_unit->getFiringAccuracy(_action.type, _action.weapon) < _parent->getTileEngine()->distance(_action.actor->getPosition(), victim->getPosition()))
+								{
+									_unit->getStatistics()->lowAccuracyHitCounter++;
+								}
+							}
+							if (victim->getFaction() == FACTION_HOSTILE)
+							{
+								AlienBAIState *aggro = dynamic_cast<AlienBAIState*>(victim->getCurrentAIState());
+								if (aggro != 0)
+								{
+									aggro->setWasHitBy(_unit);
+									_unit->setTurnsSinceSpotted(0);
+								}
+							}
+							// Record the last unit to hit our victim. If a victim dies without warning*, this unit gets the credit.
+							// *Because the unit died in a fire or bled out.
+							victim->setMurdererId(_unit->getId());
+							if (_action.weapon != 0)
+								victim->setMurdererWeapon(_action.weapon->getRules()->getName());
+							if (_ammo != 0)
+								victim->setMurdererWeaponAmmo(_ammo->getRules()->getName());
 						}
 					}
 				}

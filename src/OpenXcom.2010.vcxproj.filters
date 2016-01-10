@@ -802,12 +802,6 @@
     <ClCompile Include="Geoscape\DogfightErrorState.cpp">
       <Filter>Geoscape</Filter>
     </ClCompile>
-    <ClCompile Include="Mod\ResourcePack.cpp">
-      <Filter>Mod</Filter>
-    </ClCompile>
-    <ClCompile Include="Mod\XcomResourcePack.cpp">
-      <Filter>Mod</Filter>
-    </ClCompile>
     <ClCompile Include="Mod\AlienDeployment.cpp">
       <Filter>Mod</Filter>
     </ClCompile>
@@ -895,9 +889,6 @@
     <ClCompile Include="Mod\RuleResearch.cpp">
       <Filter>Mod</Filter>
     </ClCompile>
-    <ClCompile Include="Mod\Ruleset.cpp">
-      <Filter>Mod</Filter>
-    </ClCompile>
     <ClCompile Include="Mod\RuleSoldier.cpp">
       <Filter>Mod</Filter>
     </ClCompile>
@@ -929,6 +920,33 @@
       <Filter>Mod</Filter>
     </ClCompile>
     <ClCompile Include="Mod\Unit.cpp">
+      <Filter>Mod</Filter>
+    </ClCompile>
+    <ClCompile Include="Mod\Mod.cpp">
+      <Filter>Mod</Filter>
+    </ClCompile>
+    <ClCompile Include="Battlescape\CommendationLateState.cpp">
+      <Filter>Battlescape</Filter>
+    </ClCompile>
+    <ClCompile Include="Battlescape\CommendationState.cpp">
+      <Filter>Battlescape</Filter>
+    </ClCompile>
+    <ClCompile Include="Mod\RuleCommendations.cpp">
+      <Filter>Mod</Filter>
+    </ClCompile>
+    <ClCompile Include="Savegame\SoldierDiary.cpp">
+      <Filter>Savegame</Filter>
+    </ClCompile>
+    <ClCompile Include="Basescape\SoldierDiaryMissionState.cpp">
+      <Filter>Basescape</Filter>
+    </ClCompile>
+    <ClCompile Include="Basescape\SoldierDiaryOverviewState.cpp">
+      <Filter>Basescape</Filter>
+    </ClCompile>
+    <ClCompile Include="Basescape\SoldierDiaryPerformanceState.cpp">
+      <Filter>Basescape</Filter>
+    </ClCompile>
+    <ClCompile Include="Mod\RuleConverter.cpp">
       <Filter>Mod</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1740,9 +1758,6 @@
     <ClInclude Include="Menu\ListLoadOriginalState.h">
       <Filter>Menu</Filter>
     </ClInclude>
-    <ClInclude Include="Savegame\SaveConverterXcom1.h">
-      <Filter>Savegame</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\FlcPlayer.h">
       <Filter>Engine</Filter>
     </ClInclude>
@@ -1760,12 +1775,6 @@
     </ClInclude>
     <ClInclude Include="Geoscape\DogfightErrorState.h">
       <Filter>Geoscape</Filter>
-    </ClInclude>
-    <ClInclude Include="Mod\ResourcePack.h">
-      <Filter>Mod</Filter>
-    </ClInclude>
-    <ClInclude Include="Mod\XcomResourcePack.h">
-      <Filter>Mod</Filter>
     </ClInclude>
     <ClInclude Include="Mod\AlienDeployment.h">
       <Filter>Mod</Filter>
@@ -1854,9 +1863,6 @@
     <ClInclude Include="Mod\RuleResearch.h">
       <Filter>Mod</Filter>
     </ClInclude>
-    <ClInclude Include="Mod\Ruleset.h">
-      <Filter>Mod</Filter>
-    </ClInclude>
     <ClInclude Include="Mod\RuleSoldier.h">
       <Filter>Mod</Filter>
     </ClInclude>
@@ -1888,6 +1894,42 @@
       <Filter>Mod</Filter>
     </ClInclude>
     <ClInclude Include="Mod\Unit.h">
+      <Filter>Mod</Filter>
+    </ClInclude>
+    <ClInclude Include="Mod\Mod.h">
+      <Filter>Mod</Filter>
+    </ClInclude>
+    <ClInclude Include="Savegame\BattleUnitStatistics.h">
+      <Filter>Savegame</Filter>
+    </ClInclude>
+    <ClInclude Include="Battlescape\CommendationLateState.h">
+      <Filter>Battlescape</Filter>
+    </ClInclude>
+    <ClInclude Include="Battlescape\CommendationState.h">
+      <Filter>Battlescape</Filter>
+    </ClInclude>
+    <ClInclude Include="Geoscape\Cord.h">
+      <Filter>Geoscape</Filter>
+    </ClInclude>
+    <ClInclude Include="Savegame\MissionStatistics.h">
+      <Filter>Savegame</Filter>
+    </ClInclude>
+    <ClInclude Include="Mod\RuleCommendations.h">
+      <Filter>Mod</Filter>
+    </ClInclude>
+    <ClInclude Include="Savegame\SoldierDiary.h">
+      <Filter>Savegame</Filter>
+    </ClInclude>
+    <ClInclude Include="Basescape\SoldierDiaryMissionState.h">
+      <Filter>Basescape</Filter>
+    </ClInclude>
+    <ClInclude Include="Basescape\SoldierDiaryOverviewState.h">
+      <Filter>Basescape</Filter>
+    </ClInclude>
+    <ClInclude Include="Basescape\SoldierDiaryPerformanceState.h">
+      <Filter>Basescape</Filter>
+    </ClInclude>
+    <ClInclude Include="Mod\RuleConverter.h">
       <Filter>Mod</Filter>
     </ClInclude>
   </ItemGroup>

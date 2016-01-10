@@ -1,5 +1,6 @@
+#pragma once
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -16,9 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef OPENXCOM_ARMOR_H
-#define OPENXCOM_ARMOR_H
-
 #include <string>
 #include <vector>
 #include <yaml-cpp/yaml.h>
@@ -28,16 +26,17 @@
 namespace OpenXcom
 {
 
-enum ForcedTorso{ TORSO_USE_GENDER, TORSO_ALWAYS_MALE, TORSO_ALWAYS_FEMALE };
+enum ForcedTorso { TORSO_USE_GENDER, TORSO_ALWAYS_MALE, TORSO_ALWAYS_FEMALE };
 /**
  * Represents a specific type of armor.
- * Not only soldier armor, but also alien armor - some alien races wear Soldier Armor, Leader Armor or Commander Armor
- * depending on their rank.
+ * Not only soldier armor, but also alien armor - some alien races wear
+ * Soldier Armor, Leader Armor or Commander Armor depending on their rank.
  */
 class Armor
 {
 public:
 	static const int DAMAGE_TYPES = 10;
+	static const std::string NONE;
 private:
 	std::string _type, _spriteSheet, _spriteInv, _corpseGeo, _storeItem, _specWeapon;
 	std::vector<std::string> _corpseBattle;
@@ -52,6 +51,7 @@ private:
 	ForcedTorso _forcedTorso;
 	int _faceColorGroup, _hairColorGroup, _utileColorGroup, _rankColorGroup;
 	std::vector<int> _faceColor, _hairColor, _utileColor, _rankColor;
+	std::vector<std::string> _units;
 public:
 	/// Creates a blank armor ruleset.
 	Armor(const std::string &type);
@@ -119,10 +119,10 @@ public:
 	int getUtileColor(int i) const;
 	/// Get rank base color
 	int getRankColor(int i) const;
-	/// can we access this unit's inventory?
+	/// Can we access this unit's inventory?
 	bool hasInventory() const;
+	/// Gets the armor's units.
+	const std::vector<std::string> &getUnits() const;
 };
 
 }
-
-#endif

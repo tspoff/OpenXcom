@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -18,7 +18,7 @@
  */
 
 #include "../Mod/ArticleDefinition.h"
-#include "../Mod/Ruleset.h"
+#include "../Mod/Mod.h"
 #include "../Mod/RuleBaseFacility.h"
 #include "ArticleStateTFTD.h"
 #include "ArticleStateTFTDFacility.h"
@@ -32,7 +32,7 @@ namespace OpenXcom
 
 	ArticleStateTFTDFacility::ArticleStateTFTDFacility(ArticleDefinitionTFTD *defs) : ArticleStateTFTD(defs)
 	{
-		RuleBaseFacility *facility = _game->getRuleset()->getBaseFacility(defs->id);
+		RuleBaseFacility *facility = _game->getMod()->getBaseFacility(defs->id);
 
 		_lstInfo = new TextList(150, 50, 168, 150);
 		add(_lstInfo);

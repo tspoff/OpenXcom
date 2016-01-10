@@ -1,5 +1,6 @@
+#pragma once
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -16,9 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef OPENXCOM_MAPDATASET_H
-#define OPENXCOM_MAPDATASET_H
-
 #include <string>
 #include <vector>
 #include <SDL.h>
@@ -29,7 +27,6 @@ namespace OpenXcom
 
 class MapData;
 class SurfaceSet;
-class ResourcePack;
 
 /**
  * Represents a Terrain Map Datafile.
@@ -72,5 +69,3 @@ public:
 };
 
 }
-
-#endif

@@ -1,5 +1,6 @@
+#pragma once
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -16,24 +17,23 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef OPENXCOM_BATTLESCAPEGENERATOR_H
-#define OPENXCOM_BATTLESCAPEGENERATOR_H
-
 #include <vector>
 #include "../Mod/RuleTerrain.h"
 #include "../Mod/MapScript.h"
 
 namespace OpenXcom
 {
+
 class SavedBattleGame;
+class Mod;
 class Craft;
 class Ufo;
 class RuleTerrain;
-class ResourcePack;
 class BattleItem;
 class MapBlock;
 class Vehicle;
 class Tile;
+class RuleInventory;
 class RuleItem;
 class Unit;
 class AlienRace;
@@ -54,7 +54,7 @@ class BattlescapeGenerator
 private:
 	Game *_game;
 	SavedBattleGame *_save;
-	ResourcePack *_res;
+	Mod *_mod;
 	Craft *_craft;
 	Ufo *_ufo;
 	Base *_base;
@@ -70,7 +70,8 @@ private:
 	int _alienItemLevel;
 	bool _allowAutoLoadout, _baseInventory, _generateFuel, _craftDeployed;
 	int _craftZ;
-	SDL_Rect _craftPos, _ufoPos;
+	SDL_Rect _craftPos;
+	std::vector<SDL_Rect> _ufoPos;
 	int _blocksToDo;
 	std::vector< std::vector<MapBlock*> > _blocks;
 	std::vector< std::vector<bool> > _landingzone;
@@ -166,8 +167,9 @@ public:
 	void runInventory(Craft *craft);
 	/// Sets up the objectives for the map.
 	void setupObjectives(AlienDeployment *ruleDeploy);
+	// Autoequip a set of units
+	static void autoEquip(std::vector<BattleUnit*> units, Mod *mod, SavedBattleGame *addToSave, std::vector<BattleItem*> *craftInv,
+		RuleInventory *groundRuleInv, int worldShade, bool allowAutoLoadout, bool overrideEquipmentLayout);
 };
 
 }
-
-#endif

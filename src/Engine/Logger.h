@@ -1,5 +1,6 @@
+#pragma once
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -16,9 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef OPENXCOM_LOGGER_H
-#define OPENXCOM_LOGGER_H
-
 #include <sstream>
 #include <string>
 #include <stdio.h>
@@ -90,7 +88,7 @@ inline std::ostringstream& Logger::get(SeverityLevel level)
 inline Logger::~Logger()
 {
     os << std::endl;
-	if (reportingLevel() == LOG_DEBUG)
+	if (reportingLevel() == LOG_DEBUG || reportingLevel() == LOG_VERBOSE)
 	{
 		fprintf(stderr, "%s", os.str().c_str());
 		fflush(stderr);
@@ -117,7 +115,7 @@ inline std::string& Logger::logFile()
 
 inline std::string Logger::toString(SeverityLevel level)
 {
-	static const char* const buffer[] = {"FATAL", "ERROR", "WARN", "INFO", "DEBUG"};
+    static const char* const buffer[] = {"FATAL", "ERROR", "WARN", "INFO", "DEBUG", "VERB"};
     return buffer[level];
 }
 
@@ -153,5 +151,3 @@ inline std::string now()
 }
 
 }
-
-#endif

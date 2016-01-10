@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -95,7 +95,7 @@ void RuleMissionScript::load(const YAML::Node& node)
 			_regionWeights.push_back(std::make_pair(nn->first.as<size_t>(0), nw));
 		}
 	}
-	_researchTriggers = node["researchTriggers"].as<std::map<std::string, bool> >(_researchTriggers);
+	_researchTriggers = node["researchTriggers"].as< std::map<std::string, bool> >(_researchTriggers);
 	_useTable = node["useTable"].as<bool>(_useTable);
 	if (_varName == "" && (_maxRuns > 0 || _avoidRepeats > 0))
 	{

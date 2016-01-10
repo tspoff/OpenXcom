@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -37,12 +37,12 @@
 #include "../Mod/MapDataSet.h"
 #include "../Mod/MapData.h"
 #include "../Mod/Unit.h"
+#include "../Mod/Mod.h"
 #include "../Mod/Armor.h"
 #include "Pathfinding.h"
 #include "../Engine/Options.h"
 #include "ProjectileFlyBState.h"
 #include "MeleeAttackBState.h"
-#include "../Engine/Logger.h"
 #include "../fmath.h"
 
 namespace OpenXcom
@@ -440,7 +440,7 @@ bool TileEngine::visible(BattleUnit *currentUnit, Tile *tile)
 			{
 				visibleDistance += t->getSmoke() / 3;
 			}
-			if (visibleDistance > MAX_VOXEL_VIEW_DISTANCE)
+			if (visibleDistance > (unsigned)MAX_VOXEL_VIEW_DISTANCE)
 			{
 				unitSeen = false;
 				break;
@@ -486,7 +486,7 @@ int TileEngine::checkVoxelExposure(Position *originVoxel, Tile *tile, BattleUnit
 	int relX = floor(((float)relPos.y)*normal+0.5);
 	int relY = floor(((float)-relPos.x)*normal+0.5);
 
-	int sliceTargets[10]={0,0, relX,relY, -relX,-relY};
+	int sliceTargets[] = {0,0, relX,relY, -relX,-relY};
 
 	if (!otherUnit->isOut())
 	{
@@ -505,7 +505,7 @@ int TileEngine::checkVoxelExposure(Position *originVoxel, Tile *tile, BattleUnit
 	{
 		++total;
 		scanVoxel.z=targetMinHeight+i;
-		for (int j = 0; j < 2; ++j)
+		for (int j = 0; j < 3; ++j)
 		{
 			scanVoxel.x=targetVoxel.x + sliceTargets[j*2];
 			scanVoxel.y=targetVoxel.y + sliceTargets[j*2+1];
@@ -571,7 +571,7 @@ bool TileEngine::canTargetUnit(Position *originVoxel, Tile *tile, Position *scan
 	int relX = floor(((float)relPos.y)*normal+0.5);
 	int relY = floor(((float)-relPos.x)*normal+0.5);
 
-	int sliceTargets[10]={0,0, relX,relY, -relX,-relY, relY,-relX, -relY,relX};
+	int sliceTargets[] = {0,0, relX,relY, -relX,-relY, relY,-relX, -relY,relX};
 
 	if (!potentialUnit->isOut())
 	{
@@ -732,6 +732,7 @@ bool TileEngine::canTargetTile(Position *originVoxel, Tile *tile, int part, Posi
 
 	if (minZ > maxZ) minZ = maxZ;
 	int rangeZ = maxZ - minZ;
+	if (rangeZ>10) rangeZ = 10; //as above, clamping height range to prevent buffer overflow
 	int centerZ = (maxZ + minZ)/2;
 
 	for (int j = 0; j <= rangeZ; ++j)
@@ -1059,7 +1060,7 @@ BattleUnit *TileEngine::hit(const Position &center, int power, ItemDamageType ty
 	}
 	else if (part == V_UNIT)
 	{
-		int dmgRng = (type == DT_HE || Options::TFTDDamage) ? 50 : 100;
+		int dmgRng = type == DT_HE ? Mod::EXPLOSIVE_DAMAGE_RANGE : Mod::DAMAGE_RANGE;
 		int min = power * (100 - dmgRng) / 100;
 		int max = power * (100 + dmgRng) / 100;
 		const int rndPower = RNG::generate(min, max);
@@ -1152,7 +1153,7 @@ void TileEngine::explode(const Position &center, int power, ItemDamageType type,
 
 	int exHeight = std::max(0, std::min(3, Options::battleExplosionHeight));
 	int vertdec = 1000; //default flat explosion
-	int dmgRng = (type == DT_HE || Options::TFTDDamage) ? 50 : 100;
+	int dmgRng = type == DT_HE ? Mod::EXPLOSIVE_DAMAGE_RANGE : Mod::DAMAGE_RANGE;
 
 	switch (exHeight)
 	{
@@ -1287,8 +1288,8 @@ void TileEngine::explode(const Position &center, int power, ItemDamageType type,
 									float resistance = bu->getArmor()->getDamageModifier(DT_IN);
 									if (resistance > 0.0)
 									{
-										bu->damage(Position(0, 0, 12-dest->getTerrainLevel()), RNG::generate(5, 10), DT_IN, true);
-										int burnTime = RNG::generate(0, int(5 * resistance));
+										bu->damage(Position(0, 0, 12-dest->getTerrainLevel()), RNG::generate(Mod::FIRE_DAMAGE_RANGE[0], Mod::FIRE_DAMAGE_RANGE[1]), DT_IN, true);
+										int burnTime = RNG::generate(0, int(5.0f * resistance));
 										if (bu->getFire() < burnTime)
 										{
 											bu->setFire(burnTime); // catch fire and burn
@@ -1336,8 +1337,10 @@ void TileEngine::explode(const Position &center, int power, ItemDamageType type,
 					Pathfinding::vectorToDirection(origin->getPosition() - dest->getPosition(), dir);
 					if (dir != -1 && dir %2) power_ -= 5; // diagonal movement costs an extra 50% for fire.
 				}
-				if (l>0.5) power_-= horizontalBlockage(origin, dest, type, l<1.5) * 2;
-				if (l>0.5) power_-= verticalBlockage(origin, dest, type, l<1.5) * 2;
+				if (l > 0.5) {
+					power_ -= horizontalBlockage(origin, dest, type, l < 1.5) * 2;
+					power_ -= verticalBlockage(origin, dest, type, l < 1.5) * 2;
+				}
 			}
 		}
 	}

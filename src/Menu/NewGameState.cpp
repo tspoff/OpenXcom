@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -18,7 +18,7 @@
  */
 #include "NewGameState.h"
 #include "../Engine/Game.h"
-#include "../Mod/ResourcePack.h"
+#include "../Mod/Mod.h"
 #include "../Engine/LocalizedText.h"
 #include "../Interface/TextButton.h"
 #include "../Interface/ToggleTextButton.h"
@@ -28,7 +28,6 @@
 #include "../Geoscape/BuildNewBaseState.h"
 #include "../Engine/Options.h"
 #include "../Savegame/SavedGame.h"
-#include "../Mod/Ruleset.h"
 
 namespace OpenXcom
 {
@@ -72,7 +71,7 @@ NewGameState::NewGameState()
 	centerAllSurfaces();
 
 	// Set up objects
-	_window->setBackground(_game->getResourcePack()->getSurface("BACK01.SCR"));
+	_window->setBackground(_game->getMod()->getSurface("BACK01.SCR"));
 
 	_btnBeginner->setText(tr("STR_1_BEGINNER"));
 	_btnBeginner->setGroup(&_difficulty);
@@ -142,7 +141,7 @@ void NewGameState::btnOkClick(Action *)
 	{
 		diff = DIFF_SUPERHUMAN;
 	}
-	SavedGame *save = _game->getRuleset()->newSave();
+	SavedGame *save = _game->getMod()->newSave();
 	save->setDifficulty(diff);
 	save->setIronman(_btnIronman->getPressed());
 	_game->setSavedGame(save);

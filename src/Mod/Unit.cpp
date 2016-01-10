@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -18,6 +18,7 @@
  */
 #include "Unit.h"
 #include "../Engine/Exception.h"
+#include "Mod.h"
 
 namespace OpenXcom
 {
@@ -26,7 +27,7 @@ namespace OpenXcom
  * Creates a certain type of unit.
  * @param type String defining the type.
  */
-Unit::Unit(const std::string &type) : _type(type), _standHeight(0), _kneelHeight(0), _floatHeight(0), _value(0), _deathSound(-1), _aggroSound(-1), _moveSound(-1), _intelligence(0), _aggression(0), _energyRecovery(30), _specab(SPECAB_NONE), _livingWeapon(false), _female(false)
+Unit::Unit(const std::string &type) : _type(type), _standHeight(0), _kneelHeight(0), _floatHeight(0), _value(0), _aggroSound(-1), _moveSound(-1), _intelligence(0), _aggression(0), _energyRecovery(30), _specab(SPECAB_NONE), _livingWeapon(false), _psiWeapon("ALIEN_PSI_WEAPON")
 {
 }
 
@@ -40,10 +41,10 @@ Unit::~Unit()
 
 /**
  * Loads the unit from a YAML file.
- * @param modIndex A value that offsets the sounds and sprite values to avoid conflicts.
  * @param node YAML node.
+ * @param mod Mod for the unit.
  */
-void Unit::load(const YAML::Node &node, int modIndex)
+void Unit::load(const YAML::Node &node, Mod *mod)
 {
 	_type = node["type"].as<std::string>(_type);
 	_race = node["race"].as<std::string>(_race);
@@ -65,29 +66,30 @@ void Unit::load(const YAML::Node &node, int modIndex)
 	_spawnUnit = node["spawnUnit"].as<std::string>(_spawnUnit);
 	_livingWeapon = node["livingWeapon"].as<bool>(_livingWeapon);
 	_meleeWeapon = node["meleeWeapon"].as<std::string>(_meleeWeapon);
+	_psiWeapon = node["psiWeapon"].as<std::string>(_psiWeapon);
 	_builtInWeapons = node["builtInWeapons"].as<std::vector<std::string> >(_builtInWeapons);
-	_female = node["female"].as<bool>(_female);
-	
 	if (node["deathSound"])
 	{
-		_deathSound = node["deathSound"].as<int>(_deathSound);
-		// BATTLE.CAT: 55 entries
-		if (_deathSound > 54)
-			_deathSound += modIndex;
+		_deathSound.clear();
+		if (node["deathSound"].IsSequence())
+		{
+			for (YAML::const_iterator i = node["deathSound"].begin(); i != node["deathSound"].end(); ++i)
+			{
+				_deathSound.push_back(mod->getSoundOffset(i->as<int>(), "BATTLE.CAT"));
+			}
+		}
+		else
+		{
+			_deathSound.push_back(mod->getSoundOffset(node["deathSound"].as<int>(), "BATTLE.CAT"));
+		}
 	}
 	if (node["aggroSound"])
 	{
-		_aggroSound = node["aggroSound"].as<int>(_aggroSound);
-		// BATTLE.CAT: 55 entries
-		if (_aggroSound > 54)
-			_aggroSound += modIndex;
+		_aggroSound = mod->getSoundOffset(node["aggroSound"].as<int>(_aggroSound), "BATTLE.CAT");
 	}
 	if (node["moveSound"])
 	{
-		_moveSound = node["moveSound"].as<int>(_moveSound);
-		// BATTLE.CAT: 55 entries
-		if (_moveSound > 54)
-			_moveSound += modIndex;
+		_moveSound = mod->getSoundOffset(node["moveSound"].as<int>(_moveSound), "BATTLE.CAT");
 	}
 }
 
@@ -174,10 +176,10 @@ int Unit::getValue() const
 }
 
 /**
- * Gets the unit's death sound.
- * @return The id of the unit's death sound.
- */
-int Unit::getDeathSound() const
+* Get the unit's death sounds.
+* @return List of sound IDs.
+*/
+const std::vector<int> &Unit::getDeathSounds() const
 {
 	return _deathSound;
 }
@@ -266,6 +268,15 @@ std::string Unit::getMeleeWeapon() const
 }
 
 /**
+* What is this unit's built in psi weapon (if any).
+* @return the name of the weapon.
+*/
+std::string Unit::getPsiWeapon() const
+{
+	return _psiWeapon;
+}
+
+/**
  * What weapons does this unit have built in?
  * this is a vector of strings representing any
  * weapons that may be inherent to this creature.
@@ -276,16 +287,6 @@ std::string Unit::getMeleeWeapon() const
 const std::vector<std::string> &Unit::getBuiltInWeapons() const
 {
 	return _builtInWeapons;
-}
-
-/**
- * Is this unit a female?
- * only really relevant to the scream in the case of civilians.
- * @return female or not.
- */
-bool Unit::isFemale() const
-{
-	return _female;
 }
 
 }

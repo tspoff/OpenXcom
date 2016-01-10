@@ -1,5 +1,6 @@
+#pragma once
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -16,9 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef OPENXCOM_RULEITEM_H
-#define OPENXCOM_RULEITEM_H
-
 #include <string>
 #include <vector>
 #include <yaml-cpp/yaml.h>
@@ -31,6 +29,7 @@ enum BattleType { BT_NONE, BT_FIREARM, BT_AMMO, BT_MELEE, BT_GRENADE, BT_PROXIMI
 
 class SurfaceSet;
 class Surface;
+class Mod;
 
 /**
  * Represents a specific type of item.
@@ -74,7 +73,7 @@ public:
 	/// Cleans up the item ruleset.
 	~RuleItem();
 	/// Loads item data from YAML.
-	void load(const YAML::Node& node, int modIndex, int listIndex);
+	void load(const YAML::Node& node, Mod *mod, int listIndex);
 	/// Gets the item's type.
 	std::string getType() const;
 	/// Gets the item's name.
@@ -233,5 +232,3 @@ public:
 };
 
 }
-
-#endif

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -20,7 +20,7 @@
 #include <climits>
 #include <algorithm>
 #include "../Engine/Game.h"
-#include "../Mod/ResourcePack.h"
+#include "../Mod/Mod.h"
 #include "../Engine/Language.h"
 #include "../Interface/Window.h"
 #include "../Interface/TextList.h"
@@ -54,7 +54,7 @@ OptionsModsState::OptionsModsState(OptionsOrigin origin) : OptionsBaseState(orig
 
 	// how much room do we need for YES/NO
 	Text text = Text(100, 9, 0, 0);
-	text.initText(_game->getResourcePack()->getFont("FONT_BIG"), _game->getResourcePack()->getFont("FONT_SMALL"), _game->getLanguage());
+	text.initText(_game->getMod()->getFont("FONT_BIG"), _game->getMod()->getFont("FONT_SMALL"), _game->getLanguage());
 	text.setText(tr("STR_YES"));
 	int yes = text.getTextWidth();
 	text.setText(tr("STR_NO"));
@@ -205,7 +205,7 @@ void OptionsModsState::lstModsClick(Action *action)
 
 		mod.second = ! mod.second;
 		Options::mods[i].second = mod.second;
-		_lstMods->setCellText(_lstMods->getSelectedRow(), 2, (mod.second ? tr("STR_YES").c_str() : tr("STR_NO").c_str()));
+		_lstMods->setCellText(_lstMods->getSelectedRow(), 2, (mod.second ? tr("STR_YES") : tr("STR_NO")));
 
 		break;
 	}

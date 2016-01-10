@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -18,7 +18,7 @@
  */
 #include "BasescapeState.h"
 #include "../Engine/Game.h"
-#include "../Mod/ResourcePack.h"
+#include "../Mod/Mod.h"
 #include "../Engine/LocalizedText.h"
 #include "../Engine/Options.h"
 #include "../Interface/TextButton.h"
@@ -49,7 +49,6 @@
 #include "TransferBaseState.h"
 #include "CraftInfoState.h"
 #include "../Geoscape/AllocatePsiTrainingState.h"
-#include "../Mod/Ruleset.h"
 #include "../Mod/RuleInterface.h"
 
 namespace OpenXcom
@@ -106,13 +105,13 @@ BasescapeState::BasescapeState(Base *base, Globe *globe) : _base(base), _globe(g
 	centerAllSurfaces();
 
 	// Set up objects
-	_view->setTexture(_game->getResourcePack()->getSurfaceSet("BASEBITS.PCK"));
+	_view->setTexture(_game->getMod()->getSurfaceSet("BASEBITS.PCK"));
 	_view->onMouseClick((ActionHandler)&BasescapeState::viewLeftClick, SDL_BUTTON_LEFT);
 	_view->onMouseClick((ActionHandler)&BasescapeState::viewRightClick, SDL_BUTTON_RIGHT);
 	_view->onMouseOver((ActionHandler)&BasescapeState::viewMouseOver);
 	_view->onMouseOut((ActionHandler)&BasescapeState::viewMouseOut);
 
-	_mini->setTexture(_game->getResourcePack()->getSurfaceSet("BASEBITS.PCK"));
+	_mini->setTexture(_game->getMod()->getSurfaceSet("BASEBITS.PCK"));
 	_mini->setBases(_game->getSavedGame()->getBases());
 	_mini->onMouseClick((ActionHandler)&BasescapeState::miniClick);
 	_mini->onKeyboardPress((ActionHandler)&BasescapeState::handleKeyPress);
@@ -236,7 +235,7 @@ void BasescapeState::setBase(Base *base)
 	else
 	{
 		// Use a blank base for special case when player has no bases
-		_base = new Base(_game->getRuleset());
+		_base = new Base(_game->getMod());
 		_mini->setSelectedBase(0);
 		_game->getSavedGame()->setSelectedBase(0);
 	}
@@ -248,7 +247,7 @@ void BasescapeState::setBase(Base *base)
  */
 void BasescapeState::btnNewBaseClick(Action *)
 {
-	Base *base = new Base(_game->getRuleset());
+	Base *base = new Base(_game->getMod());
 	_game->popState();
 	_game->pushState(new BuildNewBaseState(base, _globe, false));
 }
@@ -355,12 +354,12 @@ void BasescapeState::viewLeftClick(Action *)
 		// Is facility in use?
 		if (fac->inUse())
 		{
-			_game->pushState(new ErrorMessageState(tr("STR_FACILITY_IN_USE"), _palette, _game->getRuleset()->getInterface("basescape")->getElement("errorMessage")->color, "BACK13.SCR", _game->getRuleset()->getInterface("basescape")->getElement("errorPalette")->color));
+			_game->pushState(new ErrorMessageState(tr("STR_FACILITY_IN_USE"), _palette, _game->getMod()->getInterface("basescape")->getElement("errorMessage")->color, "BACK13.SCR", _game->getMod()->getInterface("basescape")->getElement("errorPalette")->color));
 		}
 		// Would base become disconnected?
 		else if (!_base->getDisconnectedFacilities(fac).empty())
 		{
-			_game->pushState(new ErrorMessageState(tr("STR_CANNOT_DISMANTLE_FACILITY"), _palette, _game->getRuleset()->getInterface("basescape")->getElement("errorMessage")->color, "BACK13.SCR", _game->getRuleset()->getInterface("basescape")->getElement("errorPalette")->color));
+			_game->pushState(new ErrorMessageState(tr("STR_CANNOT_DISMANTLE_FACILITY"), _palette, _game->getMod()->getInterface("basescape")->getElement("errorMessage")->color, "BACK13.SCR", _game->getMod()->getInterface("basescape")->getElement("errorPalette")->color));
 		}
 		else
 		{

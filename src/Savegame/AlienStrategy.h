@@ -1,5 +1,6 @@
+#pragma once
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -16,15 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef OPENXCOM_ALIENSTRATEGY_H
-#define OPENXCOM_ALIENSTRATEGY_H
-
 #include <yaml-cpp/yaml.h>
 #include "WeightedOptions.h"
 
 namespace OpenXcom
 {
-class Ruleset;
+
+class Mod;
 
 /**
  * Stores the information about alien strategy.
@@ -37,13 +36,13 @@ public:
 	/// Free resources used by the AlienStrategy.
 	~AlienStrategy();
 	/// Initialize values according to the rules.
-	void init(const Ruleset *rules);
+	void init(const Mod *mod);
 	/// Loads the data from YAML.
-	void load(const Ruleset *rules, const YAML::Node& node);
+	void load(const YAML::Node& node);
 	/// Saves the data to YAML.
 	YAML::Node save() const;
 	/// Choose a random region for a regular mission.
-	std::string chooseRandomRegion(const Ruleset *rules);
+	std::string chooseRandomRegion(const Mod *mod);
 	/// Choose a random mission for a region.
 	std::string chooseRandomMission(const std::string &region) const;
 	/// Remove a region and mission from the list of posibilities.
@@ -73,5 +72,3 @@ private:
 };
 
 }
-
-#endif

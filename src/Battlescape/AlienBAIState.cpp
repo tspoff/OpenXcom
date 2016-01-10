@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -35,7 +35,7 @@
 #include "../Engine/Logger.h"
 #include "../Engine/Game.h"
 #include "../Mod/Armor.h"
-#include "../Mod/Ruleset.h"
+#include "../Mod/Mod.h"
 #include "../Mod/RuleItem.h"
 
 namespace OpenXcom
@@ -1495,9 +1495,9 @@ bool AlienBAIState::findFirePoint()
 bool AlienBAIState::explosiveEfficacy(Position targetPos, BattleUnit *attackingUnit, int radius, int diff, bool grenade) const
 {
 	// i hate the player and i want him dead, but i don't want to piss him off.
-	Ruleset *ruleset = _save->getBattleState()->getGame()->getRuleset();
-	if ((!grenade && _save->getTurn() < ruleset->getTurnAIUseBlaster()) ||
-		 (grenade && _save->getTurn() < ruleset->getTurnAIUseGrenade()))
+	Mod *mod = _save->getBattleState()->getGame()->getMod();
+	if ((!grenade && _save->getTurn() < mod->getTurnAIUseBlaster()) ||
+		 (grenade && _save->getTurn() < mod->getTurnAIUseGrenade()))
 	{
 		return false;
 	}
@@ -1520,11 +1520,7 @@ bool AlienBAIState::explosiveEfficacy(Position targetPos, BattleUnit *attackingU
 	{
 		efficacy -= 4;
 	}
-
-	// we don't want to ruin our own base, but we do want to ruin XCom's day.
-	if (_save->getMissionType() == "STR_ALIEN_BASE_ASSAULT") efficacy -= 3;
-	else if (_save->getMissionType() == "STR_BASE_DEFENSE" || _save->getMissionType() == "STR_TERROR_MISSION") efficacy += 3;
-
+	
 	// allow difficulty to have its influence
 	efficacy += diff/2;
 
@@ -1587,6 +1583,12 @@ bool AlienBAIState::explosiveEfficacy(Position targetPos, BattleUnit *attackingU
  */
 void AlienBAIState::meleeAction()
 {
+	int attackCost = _unit->getActionTUs(BA_HIT, _unit->getMeleeWeapon());
+	if (_unit->getTimeUnits() < attackCost)
+	{
+		// cannot make a melee attack - consider some other behaviour, like running away, or standing motionless.
+		return;
+	}
 	if (_aggroTarget != 0 && !_aggroTarget->isOut())
 	{
 		if (_save->getTileEngine()->validMeleeRange(_unit, _aggroTarget, _save->getTileEngine()->getDirectionTo(_unit->getPosition(), _aggroTarget->getPosition())))
@@ -1595,7 +1597,6 @@ void AlienBAIState::meleeAction()
 			return;
 		}
 	}
-	int attackCost = _unit->getActionTUs(BA_HIT, _unit->getMainHandWeapon());
 	int chargeReserve = _unit->getTimeUnits() - attackCost;
 	int distance = (chargeReserve / 4) + 1;
 	_aggroTarget = 0;
@@ -1636,6 +1637,12 @@ void AlienBAIState::meleeAction()
  */
 void AlienBAIState::wayPointAction()
 {
+	int attackCost = _unit->getActionTUs(BA_LAUNCH, _unit->getMainHandWeapon());
+	if (_unit->getTimeUnits() < attackCost)
+	{
+		// cannot make a launcher attack - consider some other behaviour, like running away, or standing motionless.
+		return;
+	}
 	_aggroTarget = 0;
 	for (std::vector<BattleUnit*>::const_iterator i = _save->getUnits()->begin(); i != _save->getUnits()->end() && _aggroTarget == 0; ++i)
 	{
@@ -2057,7 +2064,7 @@ void AlienBAIState::selectMeleeOrRanged()
 bool AlienBAIState::getNodeOfBestEfficacy(BattleAction *action)
 {
 	// i hate the player and i want him dead, but i don't want to piss him off.
-	if (_save->getTurn() < _save->getBattleState()->getGame()->getRuleset()->getTurnAIUseGrenade())
+	if (_save->getTurn() < _save->getBattleState()->getGame()->getMod()->getTurnAIUseGrenade())
 		return false;
 
 	int bestScore = 2;

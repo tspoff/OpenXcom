@@ -1,5 +1,6 @@
+#pragma once
 /*
- * Copyright 2010-2015 OpenXcom Developers.
+ * Copyright 2010-2016 OpenXcom Developers.
  *
  * This file is part of OpenXcom.
  *
@@ -16,9 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef OPENXCOM_ALIEN_MISSION_H
-#define OPENXCOM_ALIEN_MISSION_H
-
 #include <string>
 #include <yaml-cpp/yaml.h>
 
@@ -30,7 +28,7 @@ class Ufo;
 class Globe;
 class Game;
 class SavedGame;
-class Ruleset;
+class Mod;
 class RuleRegion;
 struct MissionWave;
 class UfoTrajectory;
@@ -72,7 +70,7 @@ public:
 	/// Gets the mission's region.
 	const std::string &getRegion() const { return _region; }
 	/// Sets the mission's region.
-	void setRegion(const std::string &region, const Ruleset &rules);
+	void setRegion(const std::string &region, const Mod &rules);
 	/// Gets the mission's race.
 	const std::string &getRace() const { return _race; }
 	/// Sets the mission's race.
@@ -114,7 +112,7 @@ public:
 	void setMissionSiteZone(int zone);
 private:
 	/// Spawns a UFO, based on mission rules.
-	Ufo *spawnUfo(const SavedGame &game, const Ruleset &ruleset, const Globe &globe, const MissionWave &wave, const UfoTrajectory &trajectory);
+	Ufo *spawnUfo(const SavedGame &game, const Mod &mod, const Globe &globe, const MissionWave &wave, const UfoTrajectory &trajectory);
 	/// Spawn an alien base
 	void spawnAlienBase(const Globe &globe, Game &engine, int zone);
 	/// Select a destination (lon/lat) based on the criteria of our trajectory and desired waypoint.
@@ -127,5 +125,3 @@ private:
 };
 
 }
-
-#endif
