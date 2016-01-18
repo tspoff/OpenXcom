@@ -183,7 +183,7 @@ BattlescapeState::BattlescapeState() : _reserve(0), _xBeforeMouseScrolling(0), _
 		tftdIcons->setY(176);
 		tftdIcons->blit(icons);
 	}
-
+	
 	// there is some cropping going on here, because the icons image is 320x200 while we only need the bottom of it.
 	SDL_Rect *r = icons->getCrop();
 	r->x = 0;
@@ -299,6 +299,7 @@ BattlescapeState::BattlescapeState() : _reserve(0), _xBeforeMouseScrolling(0), _
 	_btnKneel->setTooltip("STR_KNEEL");
 	_btnKneel->onMouseIn((ActionHandler)&BattlescapeState::txtTooltipIn);
 	_btnKneel->onMouseOut((ActionHandler)&BattlescapeState::txtTooltipOut);
+	_btnKneel->allowToggleInversion();
 
 	_btnInventory->onMouseClick((ActionHandler)&BattlescapeState::btnInventoryClick);
 	_btnInventory->onKeyboardPress((ActionHandler)&BattlescapeState::btnInventoryClick, Options::keyBattleInventory);
@@ -595,11 +596,14 @@ void BattlescapeState::mapOver(Action *action)
 		}
 
 		_isMouseScrolled = true;
-
-		// Set the mouse cursor back
-		SDL_EventState(SDL_MOUSEMOTION, SDL_IGNORE);
-		SDL_WarpMouse(_game->getScreen()->getWidth() / 2, _game->getScreen()->getHeight() / 2 - _map->getIconHeight() / 2);
-		SDL_EventState(SDL_MOUSEMOTION, SDL_ENABLE);
+		
+		if (Options::touchEnabled == false)
+		{
+			// Set the mouse cursor back
+			SDL_EventState(SDL_MOUSEMOTION, SDL_IGNORE);
+			SDL_WarpMouse(_game->getScreen()->getWidth() / 2, _game->getScreen()->getHeight() / 2 - _map->getIconHeight() / 2);
+			SDL_EventState(SDL_MOUSEMOTION, SDL_ENABLE);
+		}
 
 		// Check the threshold
 		_totalMouseMoveX += action->getDetails()->motion.xrel;
@@ -625,9 +629,12 @@ void BattlescapeState::mapOver(Action *action)
 				_totalMouseMoveX = -(int) (delta2.x * action->getXScale());
 				_totalMouseMoveY = -(int) (delta2.y * action->getYScale());
 			}
-
-			action->getDetails()->motion.x = _xBeforeMouseScrolling;
-			action->getDetails()->motion.y = _yBeforeMouseScrolling;
+			
+			if (Options::touchEnabled == false)
+			{
+				action->getDetails()->motion.x = _xBeforeMouseScrolling;
+				action->getDetails()->motion.y = _yBeforeMouseScrolling;
+			}
 			_map->setCursorType(CT_NONE);
 		}
 		else
@@ -654,8 +661,12 @@ void BattlescapeState::mapOver(Action *action)
 			int cursorY = _cursorPosition.y + Round(delta.y * action->getYScale());
 			_cursorPosition.x = std::min(_game->getScreen()->getWidth() - barWidth - (int)(Round(action->getXScale())), std::max(barWidth, cursorX));
 			_cursorPosition.y = std::min(_game->getScreen()->getHeight() - barHeight - (int)(Round(action->getYScale())), std::max(barHeight, cursorY));
-			action->getDetails()->motion.x = _cursorPosition.x;
-			action->getDetails()->motion.y = _cursorPosition.y;
+			
+			if (Options::touchEnabled == false)
+			{
+				action->getDetails()->motion.x = _cursorPosition.x;
+				action->getDetails()->motion.y = _cursorPosition.y;
+			}
 		}
 
 		// We don't want to look the mouse-cursor jumping :)
@@ -845,6 +856,18 @@ void BattlescapeState::btnShowMapClick(Action *)
 		_game->pushState (new MiniMapState (_map->getCamera(), _save));
 }
 
+void BattlescapeState::toggleKneelButton(BattleUnit* unit)
+{
+	if (_btnKneel->isTFTDMode())
+	{
+		_btnKneel->toggle(unit && unit->isKneeled());
+	}
+	else
+	{
+		_game->getMod()->getSurfaceSet("KneelButton")->getFrame((unit && unit->isKneeled()) ? 1 : 0)->blit(_btnKneel);
+	}
+}
+
 /**
  * Toggles the current unit's kneel/standup status.
  * @param action Pointer to an action.
@@ -857,14 +880,15 @@ void BattlescapeState::btnKneelClick(Action *)
 		if (bu)
 		{
 			_battleGame->kneel(bu);
-		}
+			toggleKneelButton(bu);
 
-		// update any path preview if unit kneels
-		if (_battleGame->getPathfinding()->isPathPreviewed() && bu->isKneeled())
-		{
-			_battleGame->getPathfinding()->calculate(_battleGame->getCurrentAction()->actor, _battleGame->getCurrentAction()->target);
-			_battleGame->getPathfinding()->removePreview();
-			_battleGame->getPathfinding()->previewPath();
+			// update any path preview when unit kneels
+			if (_battleGame->getPathfinding()->isPathPreviewed())
+			{
+				_battleGame->getPathfinding()->calculate(_battleGame->getCurrentAction()->actor, _battleGame->getCurrentAction()->target);
+				_battleGame->getPathfinding()->removePreview();
+				_battleGame->getPathfinding()->previewPath();
+			}
 		}
 	}
 }
@@ -1271,6 +1295,7 @@ void BattlescapeState::updateSoldierInfo()
 	{
 		_txtName->setText(L"");
 		showPsiButton(false);
+		toggleKneelButton(0);
 		return;
 	}
 
@@ -1298,6 +1323,8 @@ void BattlescapeState::updateSoldierInfo()
 	_numMorale->setValue(battleUnit->getMorale());
 	_barMorale->setMax(100);
 	_barMorale->setValue(battleUnit->getMorale());
+
+	toggleKneelButton(battleUnit);
 
 	BattleItem *leftHandItem = battleUnit->getItem("STR_LEFT_HAND");
 	_btnLeftHandItem->clear();
@@ -1481,8 +1508,8 @@ inline void BattlescapeState::handle(Action *action)
 		if (_game->getCursor()->getVisible() || ((action->getDetails()->type == SDL_MOUSEBUTTONDOWN || action->getDetails()->type == SDL_MOUSEBUTTONUP) && action->getDetails()->button.button == SDL_BUTTON_RIGHT))
 		{
 			State::handle(action);
-
-			if (_isMouseScrolling && !Options::battleDragScrollInvert)
+			
+			if (Options::touchEnabled == false && _isMouseScrolling && !Options::battleDragScrollInvert)
 			{
 				_map->setSelectorPosition((_cursorPosition.x - _game->getScreen()->getCursorLeftBlackBand()) / action->getXScale(), (_cursorPosition.y - _game->getScreen()->getCursorTopBlackBand()) / action->getYScale());
 			}
