@@ -293,6 +293,32 @@ std::string Soldier::getRankString() const
 }
 
 /**
+* Returns a localizable-string representation of
+* the soldier's military rank.
+* @return String ID for rank abbr.
+*/
+std::string Soldier::getRankShortString() const
+{
+switch (_rank)
+	{
+	case RANK_ROOKIE:
+		return "STR_ROOKIE_SHORT";
+	case RANK_SQUADDIE:
+		return "STR_SQUADDIE_SHORT";
+	case RANK_SERGEANT:
+		return "STR_SERGEANT_SHORT";
+	case RANK_CAPTAIN:
+		return "STR_CAPTAIN_SHORT";
+	case RANK_COLONEL:
+		return "STR_COLONEL_SHORT";
+	case RANK_COMMANDER:
+		return "STR_COMMANDER_SHORT";
+	default:
+		return "";
+	}
+}
+
+/**
  * Returns a graphic representation of
  * the soldier's military rank.
  * @note THE MEANING OF LIFE

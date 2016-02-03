@@ -84,6 +84,8 @@ public:
 	std::wstring getCraftString(Language *lang) const;
 	/// Gets a string version of the soldier's rank.
 	std::string getRankString() const;
+	/// Gets a abbreviated string version of the soldier's rank
+	std::string getRankShortString() const;
 	/// Gets a sprite version of the soldier's rank.
 	int getRankSprite() const;
 	/// Gets the soldier's rank.

@@ -336,10 +336,56 @@ void SoldierInfoState::init()
 	UnitStats withArmor(*current);
 	withArmor += *(_soldier->getArmor()->getStats());
 
-	SurfaceSet *texture = _game->getMod()->getSurfaceSet("BASEBITS.PCK");
-	texture->getFrame(_soldier->getRankSprite())->setX(0);
-	texture->getFrame(_soldier->getRankSprite())->setY(0);
-	texture->getFrame(_soldier->getRankSprite())->blit(_rank);
+	//Determine portrait image
+	std::string _portraitFile;
+	int _portraitIndex;
+
+	if (_soldier->getGender() == GENDER_MALE)
+	{
+		switch (_soldier->getLook())
+		{
+		case LOOK_BLONDE:
+			_portraitFile = "Portraits_m0";
+			break;
+		case LOOK_BROWNHAIR:
+			_portraitFile = "Portraits_m1";
+			break;
+		case LOOK_ORIENTAL:
+			_portraitFile = "Portraits_m2";
+			break;
+		case LOOK_AFRICAN:
+			_portraitFile = "Portraits_m3";
+			break;
+		}
+	}
+
+	else if (_soldier->getGender() == GENDER_FEMALE)
+	{
+		switch (_soldier->getLook())
+		{
+		case LOOK_BLONDE:
+			_portraitFile = "Portraits_f0";
+			break;
+		case LOOK_BROWNHAIR:
+			_portraitFile = "Portraits_f1";
+			break;
+		case LOOK_ORIENTAL:
+			_portraitFile = "Portraits_f2";
+			break;
+		case LOOK_AFRICAN:
+			_portraitFile = "Portraits_f3";
+			break;
+		}
+	}
+
+	//No indivudiaul portraits for now
+	_portraitIndex = 0;
+
+	_rank->clear();
+	SurfaceSet *texture = _game->getMod()->getSurfaceSet(_portraitFile);
+	texture->getFrame(_portraitIndex)->setX(0);
+	texture->getFrame(_portraitIndex)->setY(0);
+	texture->getFrame(_portraitIndex)->blit(_rank);
 
 	std::wostringstream ss;
 	ss << withArmor.tu;

@@ -1303,8 +1303,62 @@ void BattlescapeState::updateSoldierInfo()
 	Soldier *soldier = battleUnit->getGeoscapeSoldier();
 	if (soldier != 0)
 	{
-		SurfaceSet *texture = _game->getMod()->getSurfaceSet("SMOKE.PCK");
-		texture->getFrame(20 + soldier->getRank())->blit(_rank);
+		//Add short rank string to name
+		std::wostringstream ss;
+		ss << tr(soldier->getRankShortString());
+		ss << " ";
+		ss << soldier->getName(_game->getLanguage(), false);
+
+		_txtName->setText(ss.str());
+
+		//Determine portrait image
+		std::string _portraitFile;
+		int _portraitIndex;
+
+		if (soldier->getGender() == GENDER_MALE)
+		{
+			switch (soldier->getLook())
+			{
+			case LOOK_BLONDE:
+				_portraitFile = "Portraits_m0";
+				break;
+			case LOOK_BROWNHAIR:
+				_portraitFile = "Portraits_m1";
+				break;
+			case LOOK_ORIENTAL:
+				_portraitFile = "Portraits_m2";
+				break;
+			case LOOK_AFRICAN:
+				_portraitFile = "Portraits_m3";
+				break;
+			}
+		}
+
+		else if (soldier->getGender() == GENDER_FEMALE)
+		{
+			switch (soldier->getLook())
+			{
+			case LOOK_BLONDE:
+				_portraitFile = "Portraits_f0";
+				break;
+			case LOOK_BROWNHAIR:
+				_portraitFile = "Portraits_f1";
+				break;
+			case LOOK_ORIENTAL:
+				_portraitFile = "Portraits_f2";
+				break;
+			case LOOK_AFRICAN:
+				_portraitFile = "Portraits_f3";
+				break;
+			}
+		}
+
+		//No indivudiaul portraits for now
+		_portraitIndex = 0;
+
+		_rank->clear();
+		SurfaceSet *texture = _game->getMod()->getSurfaceSet(_portraitFile);
+		texture->getFrame(_portraitIndex)->blit(_rank);
 	}
 	else
 	{
